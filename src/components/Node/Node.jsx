@@ -2,27 +2,20 @@ import React, { Component } from "react";
 
 import "./Node.css";
 
-class Node extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
+const Node = (props) => {
+  const { isStart, isFinish, isVisited } = props;
 
-    render() {
-        const {isStart, isFinish} = this.props;
-        console.log(isStart, isFinish);
-        const extraClassName = isFinish ? 'node-finish' : isStart ? 'node-start' : '';
+  const extraClassName = isFinish
+    ? "node-finish"
+    : isStart
+    ? "node-start"
+    : isVisited
+    ? "node-processed"
+    : "";
 
-        return (
-            <div className={`node ${extraClassName}`}>
-                
-            </div>
-        )
-    }
-}
+  return <div className={`node ${extraClassName}`}></div>;
+};
 
-export const DEFAULT_NODE = {
+export const DEFAULT_NODE = {};
 
-}
-
-export default Node
+export default Node;

@@ -1,51 +1,90 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import Node from "./Node/Node";
+import { dijkstra } from "./Algorithms/Dijkstra";
+import { COL_LENGTH, ROW_LENGTH } from "./Constants.js";
 
 import "./visulizer.css";
 
-class Visulizer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      nodes: [],
-    };
-  }
+const START_NODE_ROW = 10;
+const START_NODE_COL = 15;
+const FINISH_NODE_ROW = 10;
+const FINISH_NODE_COL = 35;
 
-  componentDidMount() {
-    const nodes = [];
+const createNode = (col, row) => {
+  return {
+    col,
+    row,
+    isStart: row === START_NODE_ROW && col === START_NODE_COL,
+    isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
+    distance: Infinity,
+    isVisited: false,
+    isWall: false,
+    previousNode: null,
+  };
+};
 
-    for (let row = 0; row < 20; ++row) {
-      const currentRow = [];
-      for (let col = 0; col < 50; ++col) {
-        const currentNode = {
-          col,
-          row,
-          isStart: row === 10 && col === 5,
-          isFinish: row === 10 && col === 45,
-        };
-        currentRow.push(currentNode);
-      }
-      nodes.push(currentRow);
+const returnGrid = () => {
+  const nodes = [];
+
+  for (let row = 0; row < ROW_LENGTH; ++row) {
+    const currentRow = [];
+    for (let col = 0; col < COL_LENGTH; ++col) {
+      currentRow.push(createNode(col, row));
     }
-
-    this.setState({ nodes });
+    nodes.push(currentRow);
   }
 
-  render() {
-    const { nodes } = this.state;
-    console.log(nodes);
-    return (
+  return nodes;
+};
+
+const Visulizer = () => {
+  const [nodes, setNodes] = useState(returnGrid());
+
+  const visualDijkstra = () => {
+    const Nodes = nodes;
+    const startNode = Nodes[START_NODE_ROW][START_NODE_COL];
+    const finishNode = Nodes[FINISH_NODE_ROW][FINISH_NODE_COL];
+    const visitedInOrder = dijkstra(Nodes, startNode, finishNode);
+    console.log(visitedInOrder);
+    for(let i = 0; i < visitedInOrder.length; ++i) {
+      visitedInOrder[i].isVisited = false;
+    }
+    visualDijkstraHelper(visitedInOrder);
+  };
+
+  const visualDijkstraHelper = (visitedInOrder) => {
+    if(visitedInOrder === undefined) return;
+    for(let i = 0; i < visitedInOrder.length; ++i) {
+      setTimeout(() => {
+        const node = visitedInOrder[i];
+        const newGrid = nodes.slice();
+        const newNode = {
+          ...node,
+          isVisited: true
+        };
+        newGrid[node.row][node.col] = newNode;
+        setNodes(newGrid)
+      }, 10 * i);
+    }
+  }; 
+
+  return (
+    <div>
+      <div>
+        <input type="button" onClick={visualDijkstra} />
+      </div>
       <div className="grid">
         {nodes.map((row, rowInd) => {
           return (
             <div key={rowInd} className={"nodeContainer"}>
               {row.map((node, nodeInd) => {
-                const { isStart, isFinish } = node;
+                const { isStart, isFinish, isVisited } = node;
                 return (
                   <Node
                     key={nodeInd}
                     isStart={isStart}
                     isFinish={isFinish}
+                    isVisited={isVisited}
                     test={"foo"}
                   ></Node>
                 );
@@ -54,8 +93,8 @@ class Visulizer extends Component {
           );
         })}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default Visulizer;

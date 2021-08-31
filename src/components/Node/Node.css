@@ -12,3 +12,11 @@
 .node-start {
     background-color: green;
 }
+
+.node-processing {
+    background-color: skyblue;
+}
+
+.node-processed {
+    background-color: green;
+}
