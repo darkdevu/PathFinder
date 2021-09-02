@@ -114,7 +114,7 @@ const Visulizer = () => {
   return (
     <div>
       <div>
-        <input type="button" onClick={visualDijkstra} />
+        <input type="button" onClick={visualDijkstra}>Solve</input>
       </div>
       <div className="grid">
         {nodes.map((row, rowInd) => {
@@ -130,9 +130,9 @@ const Visulizer = () => {
                     isStart={isStart}
                     isFinish={isFinish}
                     isVisited={isVisited}
-                    handleMouseUp={handleMouseUp}
-                    handleMouseEnter={handleMouseEnter}
-                    handleMouseDown={handleMouseDown}
+                    mouseup={handleMouseUp}
+                    mouseenter={handleMouseEnter}
+                    mousedown={handleMouseDown}
                     isWall={isWall}
                     test={"foo"}
                   ></Node>

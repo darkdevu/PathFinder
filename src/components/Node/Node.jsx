@@ -10,9 +10,9 @@ const Node = (props) => {
     isStart,
     isFinish,
     isVisited,
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseEnter,
+    mouseup,
+    mousedown,
+    mouseenter,
   } = props;
 
   const extraClassName = isFinish
@@ -28,9 +28,9 @@ const Node = (props) => {
   return (
     <div
       id={`node-${row}-${col}`}
-      onMouseDown={() => handleMouseDown(row, col)}
-      onMouseUp={() => handleMouseUp(row, col)}
-      onMouseEnter={() => handleMouseEnter(row, col)}
+      onMouseDown={() => mousedown(row, col)}
+      onMouseUp={() => mouseup(row, col)}
+      onMouseEnter={() => mouseenter(row, col)}
       className={`node ${extraClassName}`}
     ></div>
   );
