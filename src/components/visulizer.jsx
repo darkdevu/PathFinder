@@ -114,7 +114,7 @@ const Visulizer = () => {
   return (
     <div>
       <div>
-        <input type="button" onClick={visualDijkstra}>Solve</input>
+        <input type="button" onClick={visualDijkstra} value={"solve"}/>
       </div>
       <div className="grid">
         {nodes.map((row, rowInd) => {
