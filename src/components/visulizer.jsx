@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Node from "./Node/Node";
-import { dijkstra } from "./Algorithms/Dijkstra";
+import { dijkstra, getNodesInShortestPathOrder } from "./Algorithms/Dijkstra";
 import { COL_LENGTH, ROW_LENGTH } from "./Constants.js";
 
 import "./visulizer.css";
 
 const START_NODE_ROW = 10;
 const START_NODE_COL = 15;
+
 const FINISH_NODE_ROW = 10;
 const FINISH_NODE_COL = 35;
 
@@ -39,34 +40,76 @@ const returnGrid = () => {
 
 const Visulizer = () => {
   const [nodes, setNodes] = useState(returnGrid());
+  const [mouseIsPressed, setMouseIsPressed] = useState(false);
 
   const visualDijkstra = () => {
     const Nodes = nodes;
     const startNode = Nodes[START_NODE_ROW][START_NODE_COL];
     const finishNode = Nodes[FINISH_NODE_ROW][FINISH_NODE_COL];
-    const visitedInOrder = dijkstra(Nodes, startNode, finishNode);
-    console.log(visitedInOrder);
-    for(let i = 0; i < visitedInOrder.length; ++i) {
-      visitedInOrder[i].isVisited = false;
+    const visitedNodesInOrder = dijkstra(Nodes, startNode, finishNode);
+    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    for (let i = 0; i < visitedNodesInOrder.length; ++i) {
+      visitedNodesInOrder[i].isVisited = false;
     }
-    visualDijkstraHelper(visitedInOrder);
+    animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
   };
 
-  const visualDijkstraHelper = (visitedInOrder) => {
-    if(visitedInOrder === undefined) return;
-    for(let i = 0; i < visitedInOrder.length; ++i) {
+  const animateDijkstra = (visitedNodesInOrder, nodesInShortestPathOrder) => {
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      if (i === visitedNodesInOrder.length) {
+        setTimeout(() => {
+          animateShortestPath(nodesInShortestPathOrder);
+        }, 10 * i);
+        return;
+      }
       setTimeout(() => {
-        const node = visitedInOrder[i];
-        const newGrid = nodes.slice();
-        const newNode = {
-          ...node,
-          isVisited: true
-        };
-        newGrid[node.row][node.col] = newNode;
-        setNodes(newGrid)
+        const node = visitedNodesInOrder[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          'node node-visited';
       }, 10 * i);
     }
-  }; 
+  }
+
+  const animateShortestPath = (nodesInShortestPathOrder) => {
+    for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
+      setTimeout(() => {
+        const node = nodesInShortestPathOrder[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          'node node-shortest-path';
+      }, 50 * i);
+    }
+  }
+
+  const handleMouseDown = (row, col) => {
+    // when mouse is entered
+    const newGrid = getNewGridWithWallToggled(row, col);
+    setMouseIsPressed(true);
+    setNodes(newGrid);
+  };
+
+  const handleMouseEnter = (row, col) => {
+    // When cursor enters a node
+    if (!mouseIsPressed) return;
+    const newGrid = getNewGridWithWallToggled(row, col);
+    setNodes(newGrid);
+  };
+
+  const handleMouseUp = () => {
+    // mouse released
+    setMouseIsPressed(false);
+  };
+
+  const getNewGridWithWallToggled = (row, col) => {
+    const newGrid = nodes.slice();
+    console.log(row, col);
+    const node = newGrid[row][col];
+    const newNode = {
+      ...node,
+      isWall: !node.isWall,
+    };
+    newGrid[row][col] = newNode;
+    return newGrid;
+  };
 
   return (
     <div>
@@ -78,13 +121,19 @@ const Visulizer = () => {
           return (
             <div key={rowInd} className={"nodeContainer"}>
               {row.map((node, nodeInd) => {
-                const { isStart, isFinish, isVisited } = node;
+                const { isStart, isFinish, isVisited, row, col, isWall } = node;
                 return (
                   <Node
+                    row={row}
+                    col={col}
                     key={nodeInd}
                     isStart={isStart}
                     isFinish={isFinish}
                     isVisited={isVisited}
+                    handleMouseUp={handleMouseUp}
+                    handleMouseEnter={handleMouseEnter}
+                    handleMouseDown={handleMouseDown}
+                    isWall={isWall}
                     test={"foo"}
                   ></Node>
                 );
